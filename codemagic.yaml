@@ -1,30 +1,35 @@
 
 workflows:
   simulator-workflow:
-    name: Build for simulator
+    name: Build Swift iOS Simulator
 
     environment:
       xcode: latest
 
     scripts:
-      - name: Check Xcode environment
+      - name: Check Xcode
         script: |
-          echo "Checking Xcode..."
           xcodebuild -version
-          which xcodebuild
+          xcodebuild -showsdks
 
-      - name: Build with Generic Destination
+      - name: List Project Schemes
         script: |
-          set -e
+          xcodebuild -list -project "yourproject.xcodeproj"
+
+      - name: Build Swift Simulator
+        script: |
+          set -o pipefail
 
           xcodebuild \
             -project "yourproject.xcodeproj" \
             -scheme "yourscheme" \
-            -sdk iphonesimulator \
             -configuration Debug \
+            -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
-            -derivedDataPath build/DerivedData \
-            CODE_SIGNING_ALLOWED=NO
+            -derivedDataPath "$CM_BUILD_DIR/build" \
+            CODE_SIGNING_ALLOWED=NO \
+            build 2>&1 | tee "$CM_BUILD_DIR/build.log"
 
     artifacts:
-      - build/DerivedData/Build/Products/Debug-iphonesimulator/*.app
+      - build/Build/Products/Debug-iphonesimulator/*.app
+      - build.log
