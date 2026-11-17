@@ -1,9 +1,29 @@
 workflows:
 
-    sample-workflow:
+  simulator-workflow:
 
-        name: Codemagic Sample Workflow
+    name: Build for simulator
 
-        max_build_duration: 120
+    environment:
 
-        instance_type: mac_mini_m2
+      xcode: latest
+
+    scripts:
+
+      - name: Build with Generic Destination
+
+        script: |
+
+          xcodebuild build \
+
+            -project "yourproject.xcodeproj" \
+
+            -scheme "yourscheme" \
+
+            -sdk iphonesimulator \
+
+            -configuration Debug          
+
+    artifacts:
+
+      - /Users/builder/Library/Developer/Xcode/DerivedData/**/*.app
